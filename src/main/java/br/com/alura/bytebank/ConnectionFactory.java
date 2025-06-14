@@ -1,13 +1,14 @@
 package br.com.alura.bytebank;
 
 import com.zaxxer.hikari.HikariDataSource;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionFactory {
 
+    private final Dotenv dotenv = Dotenv.load();
     public Connection recuperarConexao() {
         try {
             return createDataSource().getConnection();
@@ -18,10 +19,16 @@ public class ConnectionFactory {
 
     private HikariDataSource createDataSource() {
         HikariDataSource config = new HikariDataSource();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/byte_bank");
-        config.setUsername("root");
-        config.setPassword("admin");
+
+        String jdbcUrl = dotenv.get("DB_URL");
+        String username = dotenv.get("DB_USERNAME");
+        String password = dotenv.get("DB_PASSWORD");
+
+        config.setJdbcUrl(jdbcUrl);
+        config.setUsername(username);
+        config.setPassword(password);
         config.setMaximumPoolSize(10);
+
         return new HikariDataSource(config);
     }
 }
